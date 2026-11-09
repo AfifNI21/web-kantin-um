@@ -1,1 +1,1438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiKantin UM - Universitas Negeri Malang</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            um: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#1d4ed8', // Main Blue UM
+              700: '#1e40af',
+              800: '#1e3a8a', // Deep Blue UM
+              900: '#0f172a',
+              accent: '#0284c7', // Sky Blue Accent
+              gold: '#f59e0b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(29, 78, 216, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(29, 78, 216, 0.8); }
+    }
+    .pulse-glow { animation: pulseGlow 2s infinite; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col selection:bg-um-600 selection:text-white">
 
+  <!-- ================= NAVBAR GLOBAL (NETLIFY-COMPATIBLE HIGH CONTRAST) ================= -->
+  <header class="sticky top-0 z-40 bg-gradient-to-r from-um-800 via-um-700 to-um-600 text-white shadow-xl border-b border-blue-900/50">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      
+      <!-- Logo & Back Button -->
+      <div class="flex items-center space-x-3">
+        <button id="btn-back" onclick="navigateBack()" class="hidden p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10">
+          <i class="fa-solid fa-arrow-left text-sm"></i>
+        </button>
+        
+        <div onclick="resetApp()" class="flex items-center space-x-3 cursor-pointer group">
+          <div class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-um-800 font-black text-xl shadow-md group-hover:scale-105 transition-transform border border-blue-100">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-black text-xl tracking-tight leading-none text-white drop-shadow-sm">
+                SiKantin <span class="text-amber-300">UM</span>
+              </span>
+              <span class="bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Resmi Kampus
+              </span>
+            </div>
+            <p class="text-[11px] text-blue-100 font-medium">Universitas Negeri Malang</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Active Badge & Floating Controls -->
+      <div class="flex items-center space-x-3">
+        <div id="role-badge" class="hidden items-center space-x-2 bg-white/15 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 text-xs font-semibold text-white">
+          <i id="role-icon" class="fa-solid fa-user text-amber-300"></i>
+          <span id="role-name" class="capitalize">Pembeli</span>
+        </div>
+
+        <button id="cart-trigger-btn" onclick="toggleCartModal(true)" class="hidden relative bg-white text-um-800 px-4 py-2 rounded-full font-extrabold text-xs flex items-center space-x-2 shadow-lg hover:bg-blue-50 transition-all active:scale-95 border border-blue-100">
+          <i class="fa-solid fa-basket-shopping text-sm text-um-600"></i>
+          <span>Keranjang</span>
+          <span id="cart-badge-count" class="bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Breadcrumb Indicator -->
+    <div id="breadcrumb-bar" class="hidden bg-um-900/60 backdrop-blur-md border-t border-white/10 px-4 py-1.5 text-xs text-blue-100">
+      <div class="max-w-7xl mx-auto flex items-center space-x-2 overflow-x-auto custom-scrollbar whitespace-nowrap">
+        <span class="hover:underline cursor-pointer font-medium" onclick="resetApp()">Portal Utama</span>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+        <span id="bc-role" class="capitalize font-semibold text-white">Pembeli</span>
+        <span id="bc-fakultas-wrap" class="hidden">
+          <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+          <span id="bc-fakultas" class="text-amber-300 font-bold">FMIPA</span>
+        </span>
+        <span id="bc-toko-wrap" class="hidden">
+          <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+          <span id="bc-toko" class="text-sky-300 font-bold">Kantin Prasmanan Bu Nur</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- ==============================================================
+         TAMPILAN 1: MULTI-ROLE PORTAL SWITCHER
+    =============================================================== -->
+    <section id="view-level-1" class="space-y-8">
+      
+      <!-- Hero Banner UM Style -->
+      <div class="relative rounded-3xl bg-gradient-to-r from-um-800 via-um-700 to-um-600 p-6 sm:p-10 text-white shadow-xl overflow-hidden border border-blue-900/40">
+        <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl space-y-4">
+          <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-extrabold text-amber-200 border border-white/10">
+            <i class="fa-solid fa-bolt"></i>
+            <span>INTEGRATED QRIS & PRASMANAN SYSTEM UM</span>
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            Pesan Makanan Kantin UM Praktis & Bebas Antre!
+          </h1>
+          <p class="text-blue-100 text-sm sm:text-base leading-relaxed font-medium">
+            Pilih kantin fakultas favoritmu, racik menu prasmanan kreasimu sendiri, bayar instan via QRIS UM, dan pantau status antrean dapur secara real-time.
+          </p>
+        </div>
+      </div>
+
+      <!-- Title Selection -->
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Pilih Portal Akses Pengguna</h2>
+        <p class="text-slate-500 text-sm">Silakan tentukan peran Anda untuk mengakses sistem Kantin Universitas Negeri Malang</p>
+      </div>
+
+      <!-- 3 Role Selector Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Role 1: PEMBELI -->
+        <div onclick="selectRole('pembeli')" class="group relative bg-white rounded-3xl p-6 shadow-sm border-2 border-slate-200/80 hover:border-um-600 hover:shadow-2xl transition-all cursor-pointer flex flex-col justify-between overflow-hidden transform hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-14 h-14 bg-um-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-um-600/30 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-um-600 uppercase tracking-wider">Mahasiswa / Dosen / Staf</span>
+              <h3 class="text-xl font-black text-slate-900 group-hover:text-um-600 transition-colors mt-1">Portal Pembeli</h3>
+              <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                Pilih fakultas, pilih dari beberapa toko/kantin, rakit piring prasmanan, bayar QRIS instan, & dapatkan timer estimasi masak.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-um-600 font-bold text-sm">
+            <span>Mulai Pesan Prasmanan</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+        <!-- Role 2: PENJUAL -->
+        <div onclick="selectRole('penjual')" class="group relative bg-white rounded-3xl p-6 shadow-sm border-2 border-slate-200/80 hover:border-emerald-600 hover:shadow-2xl transition-all cursor-pointer flex flex-col justify-between overflow-hidden transform hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-600/30 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Mitra Stand Kantin UM</span>
+              <h3 class="text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors mt-1">Portal Penjual</h3>
+              <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                Terima pesanan masuk real-time, kelola stok menu prasmanan, bayar tagihan sewa tempat bulanan (Rp 500rb), & cek omset.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-600 font-bold text-sm">
+            <span>Masuk Dashboard Lapak</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+        <!-- Role 3: ADMIN -->
+        <div onclick="selectRole('admin')" class="group relative bg-white rounded-3xl p-6 shadow-sm border-2 border-slate-200/80 hover:border-amber-600 hover:shadow-2xl transition-all cursor-pointer flex flex-col justify-between overflow-hidden transform hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Pengelola Kantin Pusat UM</span>
+              <h3 class="text-xl font-black text-slate-900 group-hover:text-amber-600 transition-colors mt-1">Portal Admin & Analytics</h3>
+              <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                Pantau kurva statistik transaksi umum, total pendapatan komisi Rp 2.000/trx, dan rekapitulasi uang sewa tempat lapak.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-amber-600 font-bold text-sm">
+            <span>Buka Analytics Admin</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================================
+         TAMPILAN 2: PILIH KANTIN FAKULTAS / ADMIN KURVA UMUM
+    =============================================================== -->
+    <section id="view-level-2" class="hidden space-y-6">
+      
+      <!-- Sub-Header Level 2 -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <span class="text-xs font-bold text-um-600 uppercase tracking-widest">Tampilan 2 • Area Pilihan Fakultas & Data General</span>
+          <h2 id="l2-title" class="text-2xl font-black text-slate-900 mt-1">Pilih Kantin Fakultas</h2>
+          <p id="l2-subtitle" class="text-slate-500 text-xs mt-0.5">Silakan tentukan kawasan kantin fakultas yang ingin dituju</p>
+        </div>
+
+        <div id="l2-search-wrap" class="relative w-full md:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="faculty-search-input" onkeyup="filterFacultyList()" placeholder="Cari nama fakultas..." class="w-full pl-9 pr-4 py-2.5 bg-slate-100 border border-transparent rounded-xl text-xs font-semibold focus:bg-white focus:border-um-600 focus:outline-none transition-all">
+        </div>
+      </div>
+
+      <!-- GRID FAKULTAS (Untuk Pembeli & Penjual) -->
+      <div id="faculty-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Dynamic Faculty Cards Inserted by JS -->
+      </div>
+
+      <!-- DASHBOARD KURVA UMUM (Khusus Admin) -->
+      <div id="admin-general-dashboard" class="hidden space-y-6">
+        
+        <!-- Top Stats Summary Admin -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-blue-100 text-um-600 rounded-xl flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Total Omset Kantin UM</p>
+              <p id="admin-total-omset" class="text-lg font-black text-slate-900">Rp 124.500.000</p>
+              <span class="text-[10px] text-emerald-600 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> Terupdate Real-Time</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Komisi Admin (Rp 2rb/Trx)</p>
+              <p id="admin-total-commission" class="text-lg font-black text-emerald-600">Rp 8.420.000</p>
+              <span id="admin-total-transactions-count" class="text-[10px] text-slate-500 font-medium">Dari 4.210 Transaksi</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-building-user"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Pendapatan Sewa Tempat</p>
+              <p id="admin-total-rent" class="text-lg font-black text-slate-900">Rp 47.500.000</p>
+              <span class="text-[10px] text-slate-500 font-medium">95 Stand Lapak Terisi</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Total Bersih Kas Admin</p>
+              <p id="admin-net-income" class="text-lg font-black text-purple-700">Rp 55.920.000</p>
+              <span class="text-[10px] text-emerald-600 font-bold">Komisi + Sewa Tempat</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Bar Graph Admin General Curve -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="font-extrabold text-slate-900 text-base flex items-center">
+                <i class="fa-solid fa-chart-simple text-um-600 mr-2"></i>
+                Kurva Tren Transaksi & Jam Sibuk Kantin Kampus
+              </h3>
+              <p class="text-xs text-slate-500">Lonjakan pesanan harian pada tiap jam makan siang mahasiswa</p>
+            </div>
+            <button onclick="switchViewLevel(3)" class="text-xs font-bold text-um-600 hover:text-um-700 bg-blue-50 px-3.5 py-2 rounded-xl transition-all">
+              Lihat Kurva Rinci Per Toko <i class="fa-solid fa-chevron-right ml-1"></i>
+            </button>
+          </div>
+
+          <!-- Bar Graph Simulation -->
+          <div class="h-64 flex items-end justify-between gap-3 pt-6 pb-2 border-b border-slate-200">
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-500 rounded-t-md h-[25%] hover:bg-blue-600 transition-colors"></div>
+              <span class="text-[10px] font-bold text-slate-400">07:00</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-500 rounded-t-md h-[45%] hover:bg-blue-600 transition-colors"></div>
+              <span class="text-[10px] font-bold text-slate-400">09:00</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-um-600 rounded-t-md h-[95%] relative group hover:brightness-110 transition-all">
+                <span class="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">PEAK</span>
+              </div>
+              <span class="text-[10px] font-bold text-slate-800">12:00</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-500 rounded-t-md h-[80%] hover:bg-blue-600 transition-colors"></div>
+              <span class="text-[10px] font-bold text-slate-400">13:00</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-500 rounded-t-md h-[50%] hover:bg-blue-600 transition-colors"></div>
+              <span class="text-[10px] font-bold text-slate-400">15:00</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-slate-300 rounded-t-md h-[20%] hover:bg-slate-400 transition-colors"></div>
+              <span class="text-[10px] font-bold text-slate-400">17:00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==============================================================
+         TAMPILAN 3: DAFTAR TOKO / PRASMANAN BUILDER / PENJUAL / ADMIN RINCI
+    =============================================================== -->
+    <section id="view-level-3" class="hidden space-y-6">
+
+      <!-- ================= ROLE 1: PEMBELI (ALUR FAKULTAS -> PILIH TOKO -> RACIK) ================= -->
+      <div id="pembeli-prasmanan-view" class="hidden space-y-6">
+        
+        <!-- STEP A: DAFTAR BEBERAPA TOKO DI FAKULTAS TERPILIH -->
+        <div id="store-selection-wrapper" class="space-y-6">
+          <div class="bg-gradient-to-r from-um-800 to-um-600 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <span class="bg-amber-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Langkah 2 dari 3</span>
+              <h2 id="faculty-store-header-title" class="text-2xl font-black mt-2">Daftar Toko & Kantin Fakultas</h2>
+              <p class="text-blue-100 text-xs mt-1">Pilih salah satu toko untuk melihat racikan menu & prasmanan yang tersedia</p>
+            </div>
+            <button onclick="switchViewLevel(2)" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2.5 rounded-xl border border-white/20 transition-all">
+              <i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti Fakultas
+            </button>
+          </div>
+
+          <!-- Grid Daftar Toko (Beberapa Toko Per Fakultas) -->
+          <div id="store-list-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Dynamic Store Cards Inserted via JS -->
+          </div>
+        </div>
+
+        <!-- STEP B: MENU PRASMANAN BUILDER (Tampil Setelah Toko Dipilih) -->
+        <div id="prasmanan-builder-wrapper" class="hidden space-y-6">
+          
+          <!-- Banner Header Toko Terpilih -->
+          <div class="bg-gradient-to-r from-um-800 to-um-600 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <span id="selected-store-badge" class="bg-amber-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Kantin FMIPA - Stand #01</span>
+              <h2 id="selected-store-title" class="text-2xl font-black mt-2">Kantin Prasmanan Bu Nur</h2>
+              <p id="selected-store-desc" class="text-blue-100 text-xs mt-1"><i class="fa-solid fa-clock mr-1"></i> Estimasi Masak & Saji: 10 - 15 Menit</p>
+            </div>
+            <button onclick="backToStoreSelection()" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2.5 rounded-xl border border-white/20 transition-all">
+              <i class="fa-solid fa-store mr-1.5"></i> Ganti Stand Toko
+            </button>
+          </div>
+
+          <!-- RACIK PRASMANAN BUILDER -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column: Menu Selection Groups -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- STEP 1: PILIH NASI -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                  <span class="w-6 h-6 bg-um-600 text-white font-bold text-xs rounded-full flex items-center justify-center">1</span>
+                  <h3 class="font-extrabold text-slate-900 text-sm">Pilih Jenis Nasi</h3>
+                </div>
+                <div id="prasmanan-nasi-options" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- STEP 2: PILIH LAUK UTAMA -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                  <span class="w-6 h-6 bg-um-600 text-white font-bold text-xs rounded-full flex items-center justify-center">2</span>
+                  <h3 class="font-extrabold text-slate-900 text-sm">Pilih Lauk Utama</h3>
+                </div>
+                <div id="prasmanan-lauk-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- STEP 3: PILIH SAYUR / PENDAMPING (MULTI-SELECT) -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-6 h-6 bg-um-600 text-white font-bold text-xs rounded-full flex items-center justify-center">3</span>
+                    <h3 class="font-extrabold text-slate-900 text-sm">Pilih Sayur & Pendamping</h3>
+                  </div>
+                  <span class="text-[10px] font-bold text-um-600 bg-blue-50 px-2 py-0.5 rounded">Bisa Pilih Lebih Dari 1</span>
+                </div>
+                <div id="prasmanan-sayur-options" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- STEP 4: PILIH MINUMAN -->
+              <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                  <span class="w-6 h-6 bg-um-600 text-white font-bold text-xs rounded-full flex items-center justify-center">4</span>
+                  <h3 class="font-extrabold text-slate-900 text-sm">Pilih Minuman Segar</h3>
+                </div>
+                <div id="prasmanan-minuman-options" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column: Live Plate Summary Card -->
+            <div class="space-y-6">
+              <div class="bg-white p-6 rounded-3xl border-2 border-um-600 shadow-lg space-y-5 sticky top-24">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 class="font-black text-slate-900 text-base flex items-center">
+                    <i class="fa-solid fa-plate-wheat text-um-600 mr-2"></i> Piring Prasmananmu
+                  </h3>
+                  <button onclick="resetPrasmananSelection()" class="text-xs text-red-500 font-bold hover:underline">Reset</button>
+                </div>
+
+                <!-- Selected Items List -->
+                <div id="plate-items-list" class="space-y-2 text-xs min-h-[120px]">
+                  <p class="text-slate-400 text-center py-6 italic">Belum ada item prasmanan yang dipilih.</p>
+                </div>
+
+                <!-- Pricing Calculation -->
+                <div class="pt-4 border-t border-slate-100 space-y-2 text-xs">
+                  <div class="flex justify-between text-slate-600">
+                    <span>Subtotal Piring</span>
+                    <span id="plate-subtotal-text" class="font-bold text-slate-900">Rp 0</span>
+                  </div>
+                  <div class="flex justify-between text-slate-600">
+                    <span>Biaya Operasional Layanan</span>
+                    <span class="font-bold text-slate-900">Rp 1.000</span>
+                  </div>
+                  <div class="flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-100">
+                    <span>Total Harga Piring</span>
+                    <span id="plate-grand-total-text" class="text-um-600">Rp 0</span>
+                  </div>
+                </div>
+
+                <!-- Add to Main Order Button -->
+                <button onclick="addPrasmananToCart()" id="btn-add-prasmanan" disabled class="w-full bg-slate-300 text-slate-500 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all">
+                  + Tambahkan Piring Ke Keranjang
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================= ROLE 2: PENJUAL (DASHBOARD REAL-TIME) ================= -->
+      <div id="penjual-dashboard-view" class="hidden space-y-6">
+        
+        <!-- Header Lapak Penjual -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h2 id="seller-store-name-display" class="text-xl font-black text-slate-900">Kantin Prasmanan Bu Nur (FMIPA)</h2>
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">STATUS: ONLINE</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Lapak Resmi Mitra Stand Kantin UM</p>
+            </div>
+          </div>
+
+          <!-- Status Sewa Tempat Bulanan -->
+          <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between space-x-4 w-full md:w-auto">
+            <div>
+              <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider block">Tagihan Sewa Tempat Lapak</span>
+              <span class="text-sm font-black text-slate-900">Rp 500.000 / Bulan</span>
+            </div>
+            <button id="btn-pay-rent" onclick="payRent()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow">
+              Bayar Sewa Bulan Ini
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Stat Cards Penjual -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-400 font-medium">Saldo Penjual (Bersih)</p>
+            <p id="seller-balance" class="text-2xl font-black text-emerald-600 mt-1">Rp 742.000</p>
+            <span class="text-[10px] text-slate-400">Telah dipotong komisi Rp 2rb/trx</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-400 font-medium">Total Pesanan Masuk</p>
+            <p id="seller-order-count" class="text-2xl font-black text-slate-900 mt-1">18 Pesanan</p>
+            <span class="text-[10px] text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Real-Time Sinkron</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-400 font-medium">Rating Toko Saya</p>
+            <p class="text-2xl font-black text-amber-500 mt-1 flex items-center">
+              <i class="fa-solid fa-star text-lg mr-1.5"></i> 4.9 <span class="text-xs text-slate-400 font-normal ml-1.5">(140 Ulasan)</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Real-Time Incoming Order Queue Table -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-extrabold text-slate-900 text-base flex items-center">
+              <i class="fa-solid fa-bell text-emerald-600 mr-2 animate-bounce"></i> Antrean Dapur Masuk Real-Time
+            </h3>
+            <span class="bg-blue-100 text-um-600 text-xs font-bold px-2.5 py-1 rounded-full">Otomatis Update</span>
+          </div>
+
+          <!-- Queue Container -->
+          <div id="seller-order-queue" class="space-y-3">
+            <!-- Order cards injected by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= ROLE 3: ADMIN (KURVA RINCI PER TOKO) ================= -->
+      <div id="admin-detailed-view" class="hidden space-y-6">
+        
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Tampilan 3 • Detail Kurva Per Stand Toko</span>
+            <h2 class="text-2xl font-black text-slate-900 mt-1">Analytics Rinci Kantin Per Fakultas</h2>
+            <p class="text-slate-500 text-xs mt-0.5">Analisis pertumbuhan omset, jumlah transaksi, dan ketaatan sewa lapak</p>
+          </div>
+          <button onclick="alert('Laporan PDF Analitis berhasil di-export ke perangkat Anda!')" class="bg-um-600 hover:bg-um-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition-all">
+            <i class="fa-solid fa-file-pdf mr-1.5"></i> Download PDF Rekap
+          </button>
+        </div>
+
+        <!-- Breakdown Table per Store -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700 flex justify-between">
+            <span>Daftar Stand Toko Kantin</span>
+            <span>Rincian Pendapatan & Komisi Admin</span>
+          </div>
+
+          <div id="admin-store-breakdown-list" class="divide-y divide-slate-100 text-xs">
+            <!-- Dynamic rows injected by JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL SLIDE-OVER KERANJANG ================= -->
+  <div id="cart-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end transition-opacity">
+    <div class="w-full max-w-md bg-white h-full flex flex-col shadow-2xl animate-slideLeft">
+      
+      <div class="p-4 bg-um-700 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-basket-shopping text-lg"></i>
+          <h3 class="font-extrabold text-base">Keranjang Pesanan Prasmanan</h3>
+        </div>
+        <button onclick="toggleCartModal(false)" class="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Cart Item Container -->
+      <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- OPSI PEMESANAN: DINE-IN (MAKAN DI TEMPAT) VS TAKEAWAY (BUNGKUS) -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 space-y-3 text-xs">
+        <label class="font-extrabold text-slate-800 block">Pilih Tipe Pemesanan:</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-type-dinein" onclick="setOrderType('dinein')" class="p-2.5 rounded-xl border font-bold text-center transition-all bg-blue-50 border-um-600 text-um-600 shadow-sm flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Dine-In (Di Tempat)</span>
+          </button>
+          <button id="btn-type-takeaway" onclick="setOrderType('takeaway')" class="p-2.5 rounded-xl border font-bold text-center transition-all bg-white border-slate-200 text-slate-700 hover:border-slate-300 flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-box-archive"></i>
+            <span>Takeaway (Bungkus)</span>
+          </button>
+        </div>
+
+        <!-- NOMOR MEJA SELECTOR (Tampil Jika Dine-In) -->
+        <div id="table-number-wrapper" class="space-y-1 pt-1">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-slate-700 text-[11px]">Nomor Meja Kantin:</label>
+            <span class="text-[10px] text-um-600 font-extrabold">*Wajib Diisi</span>
+          </div>
+          <select id="select-table-no" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-um-600">
+            <option value="Meja 01">Meja 01 (Area Utama)</option>
+            <option value="Meja 02">Meja 02 (Area Utama)</option>
+            <option value="Meja 03">Meja 03 (Area Utama)</option>
+            <option value="Meja 04">Meja 04 (Area Tengah)</option>
+            <option value="Meja 05">Meja 05 (Area Tengah)</option>
+            <option value="Meja 06">Meja 06 (Outdoor Samping)</option>
+            <option value="Meja 07">Meja 07 (Outdoor Samping)</option>
+            <option value="Meja 08">Meja 08 (Lantai 2)</option>
+            <option value="Meja 09">Meja 09 (Lantai 2)</option>
+            <option value="Meja 10">Meja 10 (Lantai 2)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cart Summary Footer -->
+      <div class="p-5 border-t border-slate-200 bg-white space-y-3 shadow-lg">
+        <div class="space-y-1.5 text-xs text-slate-600">
+          <div class="flex justify-between">
+            <span>Subtotal Pesanan</span>
+            <span id="cart-subtotal" class="font-bold text-slate-800">Rp 0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Komisi Sistem Admin UM</span>
+            <span class="font-bold text-slate-800">Rp 2.000</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-100">
+            <span>Total Bayar</span>
+            <span id="cart-grand-total" class="text-um-600">Rp 0</span>
+          </div>
+        </div>
+
+        <button onclick="openQrisModal()" id="btn-proceed-qris" class="w-full bg-gradient-to-r from-um-600 to-um-accent hover:brightness-110 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-um-600/30 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-qrcode text-base"></i>
+          <span>Bayar Via QRIS UM Instan</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL QRIS UM INSTAN (WITH 1-KLIK OK) ================= -->
+  <div id="qris-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl relative">
+      
+      <button onclick="closeQrisModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <span class="bg-blue-100 text-um-600 text-[10px] font-black px-3 py-1 rounded-full uppercase">Simulasi QRIS Instan</span>
+        <h3 class="text-xl font-black text-slate-900 mt-1">QRIS UM Pay</h3>
+        <p class="text-xs text-slate-500">Scan atau langsung tekan konfirmasi bayar di bawah</p>
+      </div>
+
+      <!-- QR Code Visual -->
+      <div class="bg-slate-50 border-2 border-dashed border-um-600 p-4 rounded-2xl inline-block shadow-inner">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=QRIS_UM_SIMULATION_PAYMENT" alt="QRIS UM" class="w-44 h-44 mx-auto rounded-lg">
+      </div>
+
+      <div class="bg-blue-50 p-3 rounded-xl text-xs text-um-800 font-semibold">
+        Total Nominal: <span id="qris-amount-display" class="font-black text-sm text-um-600">Rp 0</span>
+      </div>
+
+      <!-- 1-KLIK INSTANT CONFIRMATION BUTTON -->
+      <button onclick="confirmQrisPaymentInstant()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all pulse-glow flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-circle-check text-base"></i>
+        <span>Konfirmasi Bayar OK (Instan)</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN ESTIMASI WAKTU TUNGGU PESANAN ================= -->
+  <div id="estimation-view-modal" class="hidden fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-100 text-center relative overflow-hidden">
+      
+      <!-- Top Decorative Bar -->
+      <div class="w-full h-2 bg-gradient-to-r from-um-600 via-amber-400 to-emerald-500 absolute top-0 left-0"></div>
+
+      <div class="space-y-1">
+        <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase">
+          <i class="fa-solid fa-circle-check mr-1"></i> Pembayaran QRIS Berhasil
+        </span>
+        <h3 class="text-2xl font-black text-slate-900 mt-2">Pesananmu Sedang Diproses Dapur</h3>
+        <p class="text-xs text-slate-500">Nomor Antrean Piring Prasmanan Anda:</p>
+        <p id="estimation-queue-no" class="text-3xl font-black text-um-600 tracking-wider">#UM-8942</p>
+      </div>
+
+      <!-- TIMER COUNTDOWN CIRCLE -->
+      <div class="relative w-36 h-36 mx-auto flex items-center justify-center bg-blue-50 rounded-full border-4 border-um-600 shadow-inner">
+        <div>
+          <span id="countdown-timer" class="text-3xl font-black text-um-600">12:00</span>
+          <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-widest mt-0.5">Estimasi Menit</span>
+        </div>
+      </div>
+
+      <!-- STATUS STEP PROGRESS -->
+      <div class="grid grid-cols-3 gap-2 text-center text-xs border-y border-slate-100 py-4">
+        <div class="space-y-1">
+          <div class="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto text-xs font-bold">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <p class="font-bold text-slate-800 text-[11px]">Terbayar</p>
+        </div>
+        <div class="space-y-1">
+          <div id="step-cooking" class="w-7 h-7 bg-um-600 text-white rounded-full flex items-center justify-center mx-auto text-xs font-bold animate-pulse">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <p class="font-bold text-um-600 text-[11px]">Dimasak</p>
+        </div>
+        <div class="space-y-1">
+          <div id="step-ready" class="w-7 h-7 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto text-xs font-bold">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <p class="font-bold text-slate-400 text-[11px]">Siap Diambil</p>
+        </div>
+      </div>
+
+      <!-- Items Ordered Summary -->
+      <div class="bg-slate-50 p-4 rounded-2xl text-left space-y-2 border border-slate-200">
+        <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
+          <p class="text-xs font-bold text-slate-700">Rincian Piring Prasmanan:</p>
+          <span id="estimation-order-type-badge" class="bg-blue-100 text-um-600 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Dine-In (Meja 01)</span>
+        </div>
+        <div id="estimation-item-details" class="text-xs text-slate-600 space-y-1">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <button onclick="finishEstimationView()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs transition-all">
+        Tutup & Pantau Di Dashboard Lapak
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT APP LOGIC ================= -->
+  <script>
+    // --- GLOBAL DATA & STATE ---
+    let currentRole = 'pembeli'; // 'pembeli' | 'penjual' | 'admin'
+    let currentViewLevel = 1;   // 1 | 2 | 3
+    let selectedFaculty = null;
+    let selectedStore = null;
+    let currentOrderType = 'dinein'; // 'dinein' | 'takeaway'
+
+    // Financial & Transaction Global State (Real-time sync)
+    let globalStats = {
+      totalTransactions: 4210,
+      totalOmset: 124500000,
+      totalAdminCommission: 8420000,
+      totalRentIncome: 47500000,
+      sellerBalance: 742000,
+      sellerOrdersCount: 18,
+      rentPaid: false
+    };
+
+    // Faculty List Data & Multiple Stores per Faculty
+    const faculties = [
+      { 
+        id: 'fmipa', 
+        code: 'FMIPA', 
+        name: 'FMIPA - MIPA', 
+        totalStores: 10, 
+        rating: 4.9,
+        stores: [
+          { id: 'fmipa-1', name: 'Kantin Prasmanan Bu Nur', standNo: 'Stand #01', time: '10-15 mnt', rating: 4.9, reviews: 180, desc: 'Prasmanan masakan rumahan Jawa Timur komplet & es jeruk peras.' },
+          { id: 'fmipa-2', name: 'Depot Nasi Rames Mbak Titik', standNo: 'Stand #03', time: '5-10 mnt', rating: 4.8, reviews: 140, desc: 'Spesialis nasi uduk, balado pedas, dan lauk oseng-oseng.' },
+          { id: 'fmipa-3', name: 'Warung Biru MIPA', standNo: 'Stand #05', time: '8-12 mnt', rating: 4.7, reviews: 95, desc: 'Soto ayam, geprek crispy, dan aneka minuman dingin.' }
+        ]
+      },
+      { 
+        id: 'ft', 
+        code: 'FT', 
+        name: 'Fakultas Teknik', 
+        totalStores: 18, 
+        rating: 4.9,
+        stores: [
+          { id: 'ft-1', name: 'Dapur Prasmanan Bu Nani', standNo: 'Stand #04', time: '10-15 mnt', rating: 4.9, reviews: 320, desc: 'Prasmanan favorit mahasiswa teknik porsi jumbo dan lauk beragam.' },
+          { id: 'ft-2', name: 'Ayam Geprek Kampus FT', standNo: 'Stand #07', time: '8-12 mnt', rating: 4.8, reviews: 210, desc: 'Ayam geprek sambal korek pedas berlevel & es teh jumbo.' },
+          { id: 'ft-3', name: 'Kantin Barokah Teknik', standNo: 'Stand #12', time: '5-10 mnt', rating: 4.7, reviews: 110, desc: 'Prasmanan tumisan hemat, gorengan hangat, dan penyetan.' }
+        ]
+      },
+      { 
+        id: 'fs', 
+        code: 'FS', 
+        name: 'Fakultas Sastra', 
+        totalStores: 15, 
+        rating: 4.8,
+        stores: [
+          { id: 'fs-1', name: 'Kantin Sastra Asri', standNo: 'Stand #02', time: '8-12 mnt', rating: 4.8, reviews: 190, desc: 'Nasi goreng, mie racik, dan menu prasmanan sayur bening.' },
+          { id: 'fs-2', name: 'Warung Nasi Mak Mur', standNo: 'Stand #06', time: '10-15 mnt', rating: 4.7, reviews: 130, desc: 'Nasi rawon, prasmanan urap-urap, dan lauk tahu tempe.' }
+        ]
+      },
+      { 
+        id: 'fip', 
+        code: 'FIP', 
+        name: 'Fakultas Ilmu Pendidikan', 
+        totalStores: 12, 
+        rating: 4.7,
+        stores: [
+          { id: 'fip-1', name: 'Warung Prasmanan Ibu Asih', standNo: 'Stand #01', time: '5-10 mnt', rating: 4.9, reviews: 240, desc: 'Menu sehat, nasi merah, dan olahan ayam bakar gurih.' },
+          { id: 'fip-2', name: 'Kedai Kopi & Makan FIP', standNo: 'Stand #04', time: '5-8 mnt', rating: 4.6, reviews: 85, desc: 'Snack, mi instan racik, dan es kopi susu.' }
+        ]
+      },
+      { 
+        id: 'feb', 
+        code: 'FEB', 
+        name: 'Fakultas Ekonomi & Bisnis', 
+        totalStores: 14, 
+        rating: 4.8,
+        stores: [
+          { id: 'feb-1', name: 'Prasmanan Eksekutif FEB', standNo: 'Stand #03', time: '8-12 mnt', rating: 4.8, reviews: 270, desc: 'Lauk komplit rendang, ayam rica-rica, dan aneka jus buah.' },
+          { id: 'feb-2', name: 'Penyetan Mas Budi FEB', standNo: 'Stand #08', time: '10-15 mnt', rating: 4.7, reviews: 160, desc: 'Bebek goreng, lele crispy, dan sambal terasi lezat.' }
+        ]
+      },
+      { 
+        id: 'fik', 
+        code: 'FIK', 
+        name: 'Fakultas Ilmu Keolahragaan', 
+        totalStores: 8, 
+        rating: 4.6,
+        stores: [
+          { id: 'fik-1', name: 'Kantin Sporty FIK', standNo: 'Stand #01', time: '5-10 mnt', rating: 4.6, reviews: 115, desc: 'Menu tinggi protein, dada ayam panggang, dan es kelapa muda.' }
+        ]
+      },
+      { 
+        id: 'fis', 
+        code: 'FIS', 
+        name: 'Fakultas Ilmu Sosial', 
+        totalStores: 11, 
+        rating: 4.7,
+        stores: [
+          { id: 'fis-1', name: 'Warung Sosial Prasmanan', standNo: 'Stand #02', time: '8-12 mnt', rating: 4.7, reviews: 145, desc: 'Nasi campur, oseng oseng mercon, dan es teh tarik.' }
+        ]
+      },
+      { 
+        id: 'fppsi', 
+        code: 'FPPsi', 
+        name: 'Fakultas Psikologi', 
+        totalStores: 6, 
+        rating: 4.8,
+        stores: [
+          { id: 'fppsi-1', name: 'Kantin Damai Psikologi', standNo: 'Stand #01', time: '5-10 mnt', rating: 4.8, reviews: 90, desc: 'Prasmanan rumahan hangat dan aneka minuman jus segar.' }
+        ]
+      }
+    ];
+
+    // Menu Prasmanan Options
+    const prasmananOptions = {
+      nasi: [
+        { id: 'n1', name: 'Nasi Putih Premium', price: 3000 },
+        { id: 'n2', name: 'Nasi Merah Organik', price: 4000 },
+        { id: 'n3', name: 'Nasi Uduk Gurih', price: 4000 }
+      ],
+      lauk: [
+        { id: 'l1', name: 'Ayam Goreng Lengkuas', price: 9000 },
+        { id: 'l2', name: 'Ayam Balado Pedas', price: 9000 },
+        { id: 'l3', name: 'Rendang Sapi Empuk', price: 12000 },
+        { id: 'l4', name: 'Ikan Nila Bakar', price: 10000 }
+      ],
+      sayur: [
+        { id: 's1', name: 'Tumis Kangkung Terasi', price: 2500 },
+        { id: 's2', name: 'Sayur Asem Segar', price: 2500 },
+        { id: 's3', name: 'Tahu & Tempe Bacem', price: 3000 },
+        { id: 's4', name: 'Sambal Terasi + Lalapan', price: 1500 }
+      ],
+      minuman: [
+        { id: 'm1', name: 'Es Teh Manis Jumbo', price: 3500 },
+        { id: 'm2', name: 'Es Jeruk Peras', price: 4500 },
+        { id: 'm3', name: 'Air Mineral Botol', price: 3000 }
+      ]
+    };
+
+    // Current Active Selections for Prasmanan
+    let selectedPrasmanan = {
+      nasi: null,
+      lauk: null,
+      sayur: [],
+      minuman: null
+    };
+
+    // Cart Items
+    let cart = [];
+    let activeIncomingOrders = [
+      { id: '#UM-8940', items: 'Nasi Putih + Ayam Balado + Tumis Kangkung', orderTypeLabel: 'Dine-In (Meja 03)', total: 16500, time: '3 Mnt Lalu', status: 'Dimasak' },
+      { id: '#UM-8941', items: 'Nasi Uduk + Rendang Sapi + Es Teh', orderTypeLabel: 'Takeaway (Bungkus)', total: 21500, time: '1 Mnt Lalu', status: 'Dimasak' }
+    ];
+
+    // --- ORDER TYPE & TABLE NUMBER HANDLER ---
+    function setOrderType(type) {
+      currentOrderType = type;
+      const btnDinein = document.getElementById('btn-type-dinein');
+      const btnTakeaway = document.getElementById('btn-type-takeaway');
+      const tableWrap = document.getElementById('table-number-wrapper');
+
+      if (type === 'dinein') {
+        btnDinein.className = "p-2.5 rounded-xl border font-bold text-center transition-all bg-blue-50 border-um-600 text-um-600 shadow-sm flex items-center justify-center space-x-1.5";
+        btnTakeaway.className = "p-2.5 rounded-xl border font-bold text-center transition-all bg-white border-slate-200 text-slate-700 hover:border-slate-300 flex items-center justify-center space-x-1.5";
+        tableWrap.classList.remove('hidden');
+      } else {
+        btnTakeaway.className = "p-2.5 rounded-xl border font-bold text-center transition-all bg-blue-50 border-um-600 text-um-600 shadow-sm flex items-center justify-center space-x-1.5";
+        btnDinein.className = "p-2.5 rounded-xl border font-bold text-center transition-all bg-white border-slate-200 text-slate-700 hover:border-slate-300 flex items-center justify-center space-x-1.5";
+        tableWrap.classList.add('hidden');
+      }
+    }
+
+    function resetApp() {
+      currentRole = 'pembeli';
+      selectedFaculty = null;
+      selectedStore = null;
+      document.getElementById('bc-fakultas-wrap').classList.add('hidden');
+      document.getElementById('bc-toko-wrap').classList.add('hidden');
+      switchViewLevel(1);
+    }
+
+    function updateHeaderState() {
+      document.getElementById('role-badge').classList.remove('hidden');
+      document.getElementById('role-badge').classList.add('flex');
+      document.getElementById('role-name').innerText = currentRole;
+      document.getElementById('bc-role').innerText = currentRole;
+
+      const cartBtn = document.getElementById('cart-trigger-btn');
+      if (currentRole === 'pembeli') cartBtn.classList.remove('hidden');
+      else cartBtn.classList.add('hidden');
+    }
+
+    // --- LEVEL 2 RENDERER ---
+    function renderLevel2() {
+      const title = document.getElementById('l2-title');
+      const subtitle = document.getElementById('l2-subtitle');
+      const facultyGrid = document.getElementById('faculty-grid');
+      const adminGeneral = document.getElementById('admin-general-dashboard');
+      const searchWrap = document.getElementById('l2-search-wrap');
+
+      if (currentRole === 'admin') {
+        title.innerText = "Dashboard Analytics General Kantin UM";
+        subtitle.innerText = "Monitoring kurva harian dan total pendapatan seluruh kantin";
+        facultyGrid.classList.add('hidden');
+        searchWrap.classList.add('hidden');
+        adminGeneral.classList.remove('hidden');
+        updateAdminStatsUI();
+      } else {
+        title.innerText = currentRole === 'pembeli' ? "Pilih Kantin Fakultas Pembeli" : "Pilih Lokasi Lapak Penjual";
+        subtitle.innerText = "Silakan tentukan gedung fakultas yang hendak diakses";
+        adminGeneral.classList.add('hidden');
+        facultyGrid.classList.remove('hidden');
+        searchWrap.classList.remove('hidden');
+        renderFacultyCards(faculties);
+      }
+    }
+
+    function renderFacultyCards(list) {
+      const container = document.getElementById('faculty-grid');
+      container.innerHTML = list.map(f => `
+        <div onclick="chooseFaculty('${f.id}')" class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm hover:border-um-600 hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="w-10 h-10 rounded-xl bg-blue-50 text-um-600 font-black text-sm flex items-center justify-center group-hover:bg-um-600 group-hover:text-white transition-colors border border-blue-100">
+                ${f.code}
+              </span>
+              <span class="text-xs font-extrabold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                <i class="fa-solid fa-star text-xs mr-1"></i>${f.rating}
+              </span>
+            </div>
+            <h3 class="font-black text-slate-900 text-base group-hover:text-um-600 transition-colors">${f.name}</h3>
+            <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-store mr-1"></i> ${f.totalStores} Stand Toko Aktif</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-um-600">
+            <span>Lihat Stand Toko</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterFacultyList() {
+      const query = document.getElementById('faculty-search-input').value.toLowerCase();
+      const filtered = faculties.filter(f => f.name.toLowerCase().includes(query) || f.code.toLowerCase().includes(query));
+      renderFacultyCards(filtered);
+    }
+
+    function chooseFaculty(id) {
+      selectedFaculty = faculties.find(f => f.id === id);
+      selectedStore = null;
+      document.getElementById('bc-fakultas-wrap').classList.remove('hidden');
+      document.getElementById('bc-fakultas').innerText = selectedFaculty.code;
+      document.getElementById('bc-toko-wrap').classList.add('hidden');
+      switchViewLevel(3);
+    }
+
+    // --- LEVEL 3 RENDERER ---
+    function renderLevel3() {
+      document.getElementById('pembeli-prasmanan-view').classList.toggle('hidden', currentRole !== 'pembeli');
+      document.getElementById('penjual-dashboard-view').classList.toggle('hidden', currentRole !== 'penjual');
+      document.getElementById('admin-detailed-view').classList.toggle('hidden', currentRole !== 'admin');
+
+      if (currentRole === 'pembeli') {
+        if (!selectedStore) {
+          renderPembeliStoresGrid();
+        } else {
+          renderPrasmananBuilder();
+        }
+      }
+      if (currentRole === 'penjual') renderPenjualDashboard();
+      if (currentRole === 'admin') renderAdminDetailedBreakdown();
+    }
+
+    // --- STEP A: TAMPILKAN DAFTAR TOKO DALAM FAKULTAS ---
+    function renderPembeliStoresGrid() {
+      document.getElementById('store-selection-wrapper').classList.remove('hidden');
+      document.getElementById('prasmanan-builder-wrapper').classList.add('hidden');
+
+      const facultyName = selectedFaculty ? selectedFaculty.name : 'FMIPA';
+      document.getElementById('faculty-store-header-title').innerText = `Daftar Stand Kantin ${facultyName}`;
+
+      const storeList = selectedFaculty ? selectedFaculty.stores : faculties[0].stores;
+      const grid = document.getElementById('store-list-grid');
+
+      grid.innerHTML = storeList.map(st => `
+        <div onclick="chooseStore('${st.id}')" class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm hover:border-um-600 hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="bg-blue-50 text-um-600 text-[10px] font-black px-2.5 py-1 rounded-full uppercase border border-blue-100">${st.standNo}</span>
+              <span class="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                <i class="fa-solid fa-star text-xs mr-1"></i>${st.rating} (${st.reviews})
+              </span>
+            </div>
+            <div>
+              <h3 class="font-black text-slate-900 text-lg group-hover:text-um-600 transition-colors">${st.name}</h3>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">${st.desc}</p>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+            <span class="text-slate-400"><i class="fa-solid fa-clock mr-1"></i>${st.time}</span>
+            <span class="text-um-600 flex items-center">Pilih & Rakit <i class="fa-solid fa-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function chooseStore(storeId) {
+      const storeList = selectedFaculty ? selectedFaculty.stores : faculties[0].stores;
+      selectedStore = storeList.find(s => s.id === storeId);
+
+      document.getElementById('bc-toko-wrap').classList.remove('hidden');
+      document.getElementById('bc-toko').innerText = selectedStore.name;
+
+      document.getElementById('store-selection-wrapper').classList.add('hidden');
+      document.getElementById('prasmanan-builder-wrapper').classList.remove('hidden');
+
+      document.getElementById('selected-store-badge').innerText = `Kantin ${selectedFaculty ? selectedFaculty.code : 'UM'} - ${selectedStore.standNo}`;
+      document.getElementById('selected-store-title').innerText = selectedStore.name;
+      document.getElementById('selected-store-desc').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> Estimasi Masak & Saji: ${selectedStore.time}`;
+
+      renderPrasmananBuilder();
+    }
+
+    function backToStoreSelection() {
+      selectedStore = null;
+      document.getElementById('bc-toko-wrap').classList.add('hidden');
+      renderPembeliStoresGrid();
+    }
+
+    // --- RACIK PRASMANAN LOGIC (PEMBELI) ---
+    function renderPrasmananBuilder() {
+      // Step 1: Nasi
+      document.getElementById('prasmanan-nasi-options').innerHTML = prasmananOptions.nasi.map(item => `
+        <button onclick="selectPrasmananItem('nasi', '${item.id}')" class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${selectedPrasmanan.nasi?.id === item.id ? 'bg-blue-50 border-um-600 text-um-600 shadow-sm' : 'border-slate-200 text-slate-700 bg-white hover:border-slate-300'}">
+          <p class="font-extrabold">${item.name}</p>
+          <p class="text-[11px] text-slate-400 font-semibold mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+        </button>
+      `).join('');
+
+      // Step 2: Lauk
+      document.getElementById('prasmanan-lauk-options').innerHTML = prasmananOptions.lauk.map(item => `
+        <button onclick="selectPrasmananItem('lauk', '${item.id}')" class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${selectedPrasmanan.lauk?.id === item.id ? 'bg-blue-50 border-um-600 text-um-600 shadow-sm' : 'border-slate-200 text-slate-700 bg-white hover:border-slate-300'}">
+          <p class="font-extrabold">${item.name}</p>
+          <p class="text-[11px] text-slate-400 font-semibold mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+        </button>
+      `).join('');
+
+      // Step 3: Sayur (Multi-select)
+      document.getElementById('prasmanan-sayur-options').innerHTML = prasmananOptions.sayur.map(item => {
+        const isSelected = selectedPrasmanan.sayur.some(s => s.id === item.id);
+        return `
+          <button onclick="toggleSayurItem('${item.id}')" class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${isSelected ? 'bg-blue-50 border-um-600 text-um-600 shadow-sm' : 'border-slate-200 text-slate-700 bg-white hover:border-slate-300'}">
+            <p class="font-extrabold">${item.name}</p>
+            <p class="text-[11px] text-slate-400 font-semibold mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+          </button>
+        `;
+      }).join('');
+
+      // Step 4: Minuman
+      document.getElementById('prasmanan-minuman-options').innerHTML = prasmananOptions.minuman.map(item => `
+        <button onclick="selectPrasmananItem('minuman', '${item.id}')" class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${selectedPrasmanan.minuman?.id === item.id ? 'bg-blue-50 border-um-600 text-um-600 shadow-sm' : 'border-slate-200 text-slate-700 bg-white hover:border-slate-300'}">
+          <p class="font-extrabold">${item.name}</p>
+          <p class="text-[11px] text-slate-400 font-semibold mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+        </button>
+      `).join('');
+
+      updateLivePlateSummary();
+    }
+
+    function selectPrasmananItem(type, itemId) {
+      const item = prasmananOptions[type].find(i => i.id === itemId);
+      selectedPrasmanan[type] = item;
+      renderPrasmananBuilder();
+    }
+
+    function toggleSayurItem(itemId) {
+      const item = prasmananOptions.sayur.find(i => i.id === itemId);
+      const index = selectedPrasmanan.sayur.findIndex(s => s.id === itemId);
+      if (index > -1) selectedPrasmanan.sayur.splice(index, 1);
+      else selectedPrasmanan.sayur.push(item);
+      renderPrasmananBuilder();
+    }
+
+    function resetPrasmananSelection() {
+      selectedPrasmanan = { nasi: null, lauk: null, sayur: [], minuman: null };
+      renderPrasmananBuilder();
+    }
+
+    function calculatePlateSubtotal() {
+      let total = 0;
+      if (selectedPrasmanan.nasi) total += selectedPrasmanan.nasi.price;
+      if (selectedPrasmanan.lauk) total += selectedPrasmanan.lauk.price;
+      selectedPrasmanan.sayur.forEach(s => total += s.price);
+      if (selectedPrasmanan.minuman) total += selectedPrasmanan.minuman.price;
+      return total;
+    }
+
+    function updateLivePlateSummary() {
+      const container = document.getElementById('plate-items-list');
+      const items = [];
+
+      if (selectedPrasmanan.nasi) items.push(selectedPrasmanan.nasi);
+      if (selectedPrasmanan.lauk) items.push(selectedPrasmanan.lauk);
+      selectedPrasmanan.sayur.forEach(s => items.push(s));
+      if (selectedPrasmanan.minuman) items.push(selectedPrasmanan.minuman);
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-center py-6 italic">Belum ada item prasmanan yang dipilih.</p>`;
+      } else {
+        container.innerHTML = items.map(i => `
+          <div class="flex justify-between items-center py-1 border-b border-slate-50">
+            <span class="font-bold text-slate-800">${i.name}</span>
+            <span class="text-slate-500">Rp ${i.price.toLocaleString('id-ID')}</span>
+          </div>
+        `).join('');
+      }
+
+      const subtotal = calculatePlateSubtotal();
+      const grandTotal = subtotal > 0 ? subtotal + 1000 : 0;
+
+      document.getElementById('plate-subtotal-text').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+      document.getElementById('plate-grand-total-text').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+      const btnAdd = document.getElementById('btn-add-prasmanan');
+      if (subtotal > 0) {
+        btnAdd.disabled = false;
+        btnAdd.className = "w-full bg-um-600 hover:bg-um-700 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer";
+      } else {
+        btnAdd.disabled = true;
+        btnAdd.className = "w-full bg-slate-300 text-slate-500 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all";
+      }
+    }
+
+    function addPrasmananToCart() {
+      const subtotal = calculatePlateSubtotal();
+      if (subtotal === 0) return;
+
+      const titleItems = [];
+      if (selectedPrasmanan.nasi) titleItems.push(selectedPrasmanan.nasi.name);
+      if (selectedPrasmanan.lauk) titleItems.push(selectedPrasmanan.lauk.name);
+      selectedPrasmanan.sayur.forEach(s => titleItems.push(s.name));
+      if (selectedPrasmanan.minuman) titleItems.push(selectedPrasmanan.minuman.name);
+
+      const storeName = selectedStore ? selectedStore.name : 'Kantin UM';
+
+      const newItem = {
+        id: 'plate-' + Date.now(),
+        title: `Piring Prasmanan (${storeName})`,
+        description: titleItems.join(' + '),
+        price: subtotal + 1000
+      };
+
+      cart.push(newItem);
+      updateCartUI();
+      resetPrasmananSelection();
+      toggleCartModal(true);
+    }
+
+    // --- CART MODAL & CHECKOUT LOGIC ---
+    function toggleCartModal(show) {
+      document.getElementById('cart-modal').classList.toggle('hidden', !show);
+    }
+
+    function updateCartUI() {
+      document.getElementById('cart-badge-count').innerText = cart.length;
+      const container = document.getElementById('cart-items-container');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 space-y-2">
+            <i class="fa-solid fa-basket-shopping text-4xl text-slate-300"></i>
+            <p class="font-bold text-xs">Keranjang prasmanan Anda kosong</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = cart.map((item, idx) => `
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex justify-between items-start">
+            <div class="pr-2 space-y-1">
+              <h4 class="font-black text-xs text-slate-900">${item.title}</h4>
+              <p class="text-[11px] text-slate-500 leading-tight">${item.description}</p>
+              <p class="font-extrabold text-xs text-um-600 mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="text-red-400 hover:text-red-600 p-1">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      const subtotal = cart.reduce((acc, i) => acc + i.price, 0);
+      const grandTotal = subtotal > 0 ? subtotal + 2000 : 0;
+
+      document.getElementById('cart-subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+      document.getElementById('cart-grand-total').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+    }
+
+    function removeCartItem(idx) {
+      cart.splice(idx, 1);
+      updateCartUI();
+    }
+
+    // --- QRIS PAYMENT & ESTIMATION PAGE REVISION LOGIC ---
+    function openQrisModal() {
+      if (cart.length === 0) return alert('Keranjang masih kosong!');
+      const subtotal = cart.reduce((acc, i) => acc + i.price, 0);
+      const grandTotal = subtotal + 2000;
+      document.getElementById('qris-amount-display').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+      toggleCartModal(false);
+      document.getElementById('qris-modal').classList.remove('hidden');
+    }
+
+    function closeQrisModal() {
+      document.getElementById('qris-modal').classList.add('hidden');
+    }
+
+    function confirmQrisPaymentInstant() {
+      closeQrisModal();
+
+      const subtotal = cart.reduce((acc, i) => acc + i.price, 0);
+      const grandTotal = subtotal + 2000;
+      const newQueueNo = '#UM-' + Math.floor(1000 + Math.random() * 9000);
+      const orderSummaryText = cart.map(i => i.description).join(' | ');
+
+      // Build Order Type Label
+      let typeLabel = "Takeaway (Bungkus)";
+      if (currentOrderType === 'dinein') {
+        const tableNo = document.getElementById('select-table-no').value;
+        typeLabel = `Dine-In (${tableNo})`;
+      }
+
+      // 1. PUSH TRANSACTION DATA TO GLOBAL FINANCIAL STATE
+      globalStats.totalTransactions += 1;
+      globalStats.totalOmset += grandTotal;
+      globalStats.totalAdminCommission += 2000; // Rp 2.000 Per Transaksi
+      globalStats.sellerBalance += (grandTotal - 2000); // Saldo Penjual bertambah setelah dikurangi komisi
+      globalStats.sellerOrdersCount += 1;
+
+      // 2. PUSH TO REAL-TIME SELLER INCOMING QUEUE WITH ORDER TYPE & TABLE NO
+      activeIncomingOrders.unshift({
+        id: newQueueNo,
+        items: orderSummaryText,
+        orderTypeLabel: typeLabel,
+        total: grandTotal,
+        time: 'Baru Saja',
+        status: 'Dimasak'
+      });
+
+      // 3. SHOW ESTIMATION TIMER MODAL TO BUYER WITH TABLE / TYPE BADGE
+      document.getElementById('estimation-queue-no').innerText = newQueueNo;
+      document.getElementById('estimation-order-type-badge').innerText = typeLabel;
+      document.getElementById('estimation-item-details').innerHTML = cart.map(i => `
+        <div class="flex justify-between py-0.5 border-b border-slate-200/50">
+          <span>${i.description}</span>
+          <span class="font-bold">Rp ${i.price.toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('estimation-view-modal').classList.remove('hidden');
+      startCountdownTimer(12); // Start 12 Minute Timer Simulation
+
+      // Clear Cart
+      cart = [];
+      updateCartUI();
+
+      // Refresh background seller and admin screens if updated
+      updateAdminStatsUI();
+      renderPenjualDashboard();
+    }
+
+    function startCountdownTimer(minutes) {
+      let seconds = minutes * 60;
+      const display = document.getElementById('countdown-timer');
+      
+      const interval = setInterval(() => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        if (--seconds < 0) {
+          clearInterval(interval);
+          display.innerText = "SIAP!";
+          document.getElementById('step-cooking').classList.remove('animate-pulse', 'bg-um-600');
+          document.getElementById('step-cooking').classList.add('bg-emerald-600');
+          document.getElementById('step-ready').classList.remove('bg-slate-200', 'text-slate-400');
+          document.getElementById('step-ready').classList.add('bg-emerald-600', 'text-white', 'animate-bounce');
+        }
+      }, 1000);
+    }
+
+    function finishEstimationView() {
+      document.getElementById('estimation-view-modal').classList.add('hidden');
+    }
+
+    // --- SELLER DASHBOARD LOGIC ---
+    function renderPenjualDashboard() {
+      const storeName = selectedStore ? selectedStore.name : 'Kantin Prasmanan Bu Nur (FMIPA)';
+      document.getElementById('seller-store-name-display').innerText = storeName;
+      document.getElementById('seller-balance').innerText = `Rp ${globalStats.sellerBalance.toLocaleString('id-ID')}`;
+      document.getElementById('seller-order-count').innerText = `${globalStats.sellerOrdersCount} Pesanan`;
+
+      const queueContainer = document.getElementById('seller-order-queue');
+      queueContainer.innerHTML = activeIncomingOrders.map((ord, idx) => `
+        <div class="bg-blue-50/60 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-black text-xs text-um-600">${ord.id}</span>
+              <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase"><i class="fa-solid fa-chair mr-1"></i>${ord.orderTypeLabel}</span>
+              <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">Lunas via QRIS UM</span>
+              <span class="text-[10px] text-slate-400 font-semibold">• ${ord.time}</span>
+            </div>
+            <p class="font-bold text-xs text-slate-800 mt-1">${ord.items}</p>
+            <p class="text-[11px] font-extrabold text-emerald-600">Total Nilai Piring: Rp ${ord.total.toLocaleString('id-ID')}</p>
+          </div>
+          <button onclick="completeSellerOrder(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow transition-all shrink-0">
+            Tandai Makanan Siap Saji
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function completeSellerOrder(idx) {
+      activeIncomingOrders.splice(idx, 1);
+      renderPenjualDashboard();
+    }
+
+    function payRent() {
+      if (globalStats.rentPaid) return alert('Tagihan sewa bulan ini sudah lunas!');
+      globalStats.rentPaid = true;
+      globalStats.totalRentIncome += 500000;
+      document.getElementById('btn-pay-rent').innerText = "LUNAS (Rp 500rb)";
+      document.getElementById('btn-pay-rent').className = "bg-slate-200 text-slate-600 text-xs font-bold px-3.5 py-2 rounded-xl cursor-default";
+      updateAdminStatsUI();
+      alert('Pembayaran sewa tempat lapak sebesar Rp 500.000 berhasil ditransfer ke Admin UM!');
+    }
+
+    // --- ADMIN DETAILED BREAKDOWN LOGIC ---
+    function updateAdminStatsUI() {
+      const netIncome = globalStats.totalAdminCommission + globalStats.totalRentIncome;
+      document.getElementById('admin-total-omset').innerText = `Rp ${globalStats.totalOmset.toLocaleString('id-ID')}`;
+      document.getElementById('admin-total-commission').innerText = `Rp ${globalStats.totalAdminCommission.toLocaleString('id-ID')}`;
+      document.getElementById('admin-total-transactions-count').innerText = `Dari ${globalStats.totalTransactions.toLocaleString('id-ID')} Transaksi`;
+      document.getElementById('admin-total-rent').innerText = `Rp ${globalStats.totalRentIncome.toLocaleString('id-ID')}`;
+      document.getElementById('admin-net-income').innerText = `Rp ${netIncome.toLocaleString('id-ID')}`;
+    }
+
+    function renderAdminDetailedBreakdown() {
+      updateAdminStatsUI();
+      const list = [
+        { name: 'Kantin Prasmanan Bu Nur', faculty: 'FMIPA', orders: globalStats.sellerOrdersCount, omset: globalStats.sellerBalance, rentStatus: globalStats.rentPaid ? 'Lunas' : 'Menunggu' },
+        { name: 'Dapur Prasmanan Bu Nani', faculty: 'FT', orders: 1540, omset: 28400000, rentStatus: 'Lunas' },
+        { name: 'Bakso Malang Cak Mus', faculty: 'FIP', orders: 1240, omset: 24800000, rentStatus: 'Lunas' },
+        { name: 'Depot Penyetan Bu Sri', faculty: 'FT', orders: 980, omset: 18600000, rentStatus: 'Lunas' },
+        { name: 'Kopi Reboan Skena', faculty: 'FS', orders: 850, omset: 14200000, rentStatus: 'Lunas' }
+      ];
+
+      document.getElementById('admin-store-breakdown-list').innerHTML = list.map((s, idx) => `
+        <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center space-x-3">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-um-600 font-extrabold flex items-center justify-center text-[10px]">#${idx+1}</span>
+            <div>
+              <p class="font-bold text-slate-900">${s.name}</p>
+              <p class="text-[10px] text-slate-400">Kantin Fakultas ${s.faculty}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-6 text-right">
+            <div>
+              <p class="text-[10px] text-slate-400">Total Transaksi</p>
+              <p class="font-bold text-slate-800">${s.orders} Trx</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400">Komisi Admin (+Rp 2rb)</p>
+              <p class="font-bold text-emerald-600">Rp ${(s.orders * 2000).toLocaleString('id-ID')}</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400">Status Sewa Tempat</p>
+              <span class="font-bold text-[10px] px-2 py-0.5 rounded ${s.rentStatus === 'Lunas' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${s.rentStatus}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      updateCartUI();
+    };
+  </script>
+</body>
+</html>
